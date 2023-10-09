@@ -15,13 +15,12 @@ namespace wayne {
 		{
 			if (isDirectoryExist(dirPath))
 			{
-				switch(writeType)
+				if (writeType == (std::string)"s" || writeType == (std::string)"d")
 				{
-				case "s":
-				case "d":
 					return false;
-					break;
-				case "o":
+				}
+				else if (writeType == (std::string)"o")
+				{
 					if (removeDirectory(dirPath))
 					{
 						return std::filesystem::create_directory(dirPath);
@@ -30,10 +29,10 @@ namespace wayne {
 					{
 						return false;
 					}
-					break;
-				default:
+				}
+				else
+				{
 					return false;
-					break;
 				}
 			}
 			return std::filesystem::create_directory(dirPath);
@@ -41,13 +40,15 @@ namespace wayne {
 
 		bool createDirectory(const char* dirPath, const char* writeType)
 		{
-			return createDirectory(const_cast<char*>(dirPath), const_cast<char*>(writeType));
+			std::string strDirPath(dirPath);
+			std::string strWriteType;
+			return createDirectory(strDirPath, strWriteType);
 		}
 
 		bool createDirectory(char* dirPath, char* writeType)
 		{
 			std::string strDirPath(dirPath);
-			std::string strWriteType
+			std::string strWriteType;
 			return createDirectory(strDirPath, strWriteType);
 		}
 
@@ -63,13 +64,14 @@ namespace wayne {
 
 		bool removeDirectory(const char* dirPath)
 		{
-			return removeDirectory(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return removeDirectory(strDirPath);
 		}
 
 		bool removeDirectory(char* dirPath)
 		{
 			std::string strDirPath(dirPath);
-			return removeDirectory(dirPath);
+			return removeDirectory(strDirPath);
 		}
 
 		/*Copy Directory*/
@@ -78,34 +80,37 @@ namespace wayne {
 		{
 			if (isDirectoryExist(destPath))
 			{
-				switch (writeType)
+				if (writeType == (std::string)"m")
 				{
-				case "m": /*Mirror*/
-					if (removeDirectory(destPath))
-					{
-						return std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive);
-					}
-					break;
-				case "o": /*Overwrite*/
-					return std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
-					break;
-				case "s": /*Secure*/
-				case "d": /*Default*/
+					std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive);
+					return true;
+				}
+				else if (writeType == (std::string)"o")
+				{
+					std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+					return true;
+				}
+				else if (writeType == (std::string)"s" || writeType == (std::string)"d")
+				{
 					wayne::IO::logLn(destPath + (std::string)" exists!", true);
 					return false;
-					break;
-				default:
+				}
+				else
+				{
 					wayne::IO::logLn((std::string)"Unknown Write Type : " + writeType, true);
 					return false;
-					break;
 				}
 			}
-			return std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive);
+			std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::recursive);
+			return true;
 		}
 
 		bool copyDirectory(const char* sourcePath, const char* destPath, const char* writeType)
 		{
-			return copyDirectory(const_cast<char*>(sourcePath), const_cast<char*>(destPath), const_cast<char*>(writeType));
+			std::string strSourcePath(sourcePath);
+			std::string strDestPath(destPath);
+			std::string strWriteType(writeType);
+			return copyDirectory(strSourcePath, strDestPath, strWriteType);
 		}
 
 		bool copyDirectory(char* sourcePath, char* destPath, char* writeType)
@@ -146,14 +151,18 @@ namespace wayne {
 				else
 				{
 					/*Ignore the writeType, it is only avail when the destPath exists*/
-					return std::filesystem::rename(sourcePath, destPath);
+					std::filesystem::rename(sourcePath, destPath);
+					return true;
 				}
 			}
 		}
 
 		bool moveDirectory(const char* sourcePath, const char* destPath, const char* writeType)
 		{
-			return moveDirectory(const_cast<char*>(sourcePath), const_cast<char*>(destPath), const_cast<char*>(writeType));
+			std::string strSourcePath(sourcePath);
+			std::string strDestPath(destPath);
+			std::string strWriteType(writeType);
+			return moveDirectory(strSourcePath, strDestPath, strWriteType);
 		}
 
 		bool moveDirectory(char* sourcePath, char* destPath, char* writeType)
@@ -169,26 +178,25 @@ namespace wayne {
 		{
 			if (isFileExist(filePath))
 			{
-				switch (writeType)
+				if (writeType == (std::string)"s" || writeType == (std::string)"d")
 				{
-				case "s":
-				case "d":
 					return false;
-					break;
-				case "o":
+				}
+				else if (writeType == (std::string)"o")
+				{
 					removeFile(filePath);
-					std::ofstream fileOutput(filePath);
+					std::ofstream fileOutput(filePath.c_str());
 					if (fileOutput.is_open())
 					{
 						fileOutput.close();
 						return true;
 					}
 					return false;
-					break;
-				default:
+				}
+				else
+				{
 					wayne::IO::outLn((std::string)"Unsupported Flag : " + writeType);
 					return false;
-					break;
 				}
 			}
 			else
@@ -206,7 +214,9 @@ namespace wayne {
 
 		bool createFile(const char* filePath, const char* writeType)
 		{
-			return createFile(const_cast<char*>(filePath), const_cast<char*>(writeType));
+			std::string strFilePath(filePath);
+			std::string strWriteType(writeType);
+			return createFile(strFilePath, strWriteType);
 		}
 
 		bool createFile(char* filePath, char* writeType)
@@ -228,7 +238,8 @@ namespace wayne {
 
 		bool removeFile(const char* filePath)
 		{
-			return removeFile(const_cast<char*>(filePath));
+			std::string strFilePath(filePath);
+			return removeFile(strFilePath);
 		}
 
 		bool removeFile(char* filePath)
@@ -242,28 +253,32 @@ namespace wayne {
 		{
 			if (isFileExist(destPath))
 			{
-				switch (writeType)
+				if (writeType == (std::string)"o")
 				{
-				case "o":
-					return std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::overwrite_existing);
-					break;
-				case "s":
-				case "d":
+					std::filesystem::copy(sourcePath, destPath, std::filesystem::copy_options::overwrite_existing);
+					return true;
+				}
+				else if (writeType == (std::string)"s" || writeType == (std::string)"d")
+				{
 					wayne::IO::logLn(destPath + (std::string)" exists!", true);
 					return false;
-					break;
-				default:
+				}
+				else
+				{
 					wayne::IO::logLn((std::string)"Unknown Write Type : " + writeType, true);
 					return false;
-					break;
 				}
 			}
-			return std::filesystem::copy(sourcePath, destPath);
+			std::filesystem::copy(sourcePath, destPath);
+			return true;
 		}
 
 		bool copyFile(const char* sourcePath, const char* destPath, const char* writeType)
 		{
-			return copyFile(const_cast<char*>(sourcePath), const_cast<char*>(destPath), const_cast<char*>(writeType));
+			std::string strSourcePath(sourcePath);
+			std::string strDestPath(destPath);
+			std::string strWriteType(writeType);
+			return copyFile(strSourcePath, strDestPath, strWriteType);
 		}
 
 		bool copyFile(char* sourcePath, char* destPath, char* writeType)
@@ -300,14 +315,18 @@ namespace wayne {
 				}
 				else
 				{
-					return std::filesystem::rename(sourcePath, destPath);
+					std::filesystem::rename(sourcePath, destPath);
+					return true;
 				}
 			}
 		}
 
 		bool moveFile(const char* sourcePath, const char* destPath, const char* writeType)
 		{
-			return moveFile(const_cast<char*>(sourcePath), const_cast<char*>(destPath), const_cast<char*>(writeType));
+			std::string strSourcePath(sourcePath);
+			std::string strDestPath(destPath);
+			std::string strWriteType(writeType);
+			return moveFile(strSourcePath, strDestPath, strWriteType);
 		}
 
 		bool moveFile(char* sourcePath, char* destPath, char* writeType)
@@ -326,7 +345,8 @@ namespace wayne {
 
 		bool isFileExist(const char* filePath)
 		{
-			return isFileExist(const_cast<char*>(filePath));
+			std::string strFilePath(filePath);
+			return isFileExist(strFilePath);
 		}
 
 		bool isFileExist(char* filePath)
@@ -343,7 +363,8 @@ namespace wayne {
 
 		bool isFile(const char* filePath)
 		{
-			return isFile(const_cast<char*>(filePath));
+			std::string strFilePath(filePath);
+			return isFile(strFilePath);
 		}
 
 		bool isFile(char* filePath)
@@ -360,7 +381,8 @@ namespace wayne {
 
 		bool isDirectoryExist(const char* dirPath)
 		{
-			return isFileExist(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return isFileExist(strDirPath);
 		}
 
 		bool isDirectoryExist(char* dirPath)
@@ -377,7 +399,8 @@ namespace wayne {
 
 		bool isDirectory(const char* dirPath)
 		{
-			return isDirectory(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return isDirectory(strDirPath);
 		}
 
 		bool isDirectory(char* dirPath)
@@ -405,7 +428,8 @@ namespace wayne {
 
 		int getDirectorySize(const char* dirPath)
 		{
-			return getDirectorySize(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return getDirectorySize(strDirPath);
 		}
 
 		int getDirectorySize(char* dirPath)
@@ -422,7 +446,8 @@ namespace wayne {
 
 		int getFileSize(const char* filePath)
 		{
-			return getFileSize(const_cast<char*>(filePath));
+			std::string strFilePath(filePath);
+			return getFileSize(strFilePath);
 		}
 
 		int getFileSize(char* filePath)
@@ -448,7 +473,8 @@ namespace wayne {
 
 		std::vector<std::string> getStringListDir(const char* dirPath)
 		{
-			return getStringListDir(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return getStringListDir(strDirPath);
 		}
 
 		std::vector<std::string> getStringListDir(char* dirPath)
@@ -475,20 +501,21 @@ namespace wayne {
 
 		std::vector<char*> getCStringListDir(const char* dirPath)
 		{
-			return getStringListDir(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return getCStringListDir(strDirPath);
 		}
 
 		std::vector<char*> getCStringListDir(char* dirPath)
 		{
 			std::string strDirPath(dirPath);
-			return getStringListDir(strDirPath);
+			return getCStringListDir(strDirPath);
 		}
 
 		std::string* getStringListDirStatic(std::string dirPath)
 		{
 			std::vector<std::string> returnedList = getStringListDir(dirPath);
 			std::string* toReturn = new std::string[(int)returnedList.size()];
-			for (ssize_t i = 0; i < returnedList.size(); i++)
+			for (size_t i = 0; i < returnedList.size(); i++)
 			{
 				toReturn[i] = returnedList[i];
 			}
@@ -497,7 +524,8 @@ namespace wayne {
 
 		std::string* getStringListDirStatic(const char* dirPath)
 		{
-			return getStringListDirStatic(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return getStringListDirStatic(strDirPath);
 		}
 
 		std::string* getStringListDirStatic(char* dirPath)
@@ -510,7 +538,7 @@ namespace wayne {
 		{
 			std::vector<std::string> returnedList = getStringListDir(dirPath);
 			char** toReturn = new char*[returnedList.size()];
-			for (ssize_t i = 0; i < returnedList.size(); i++)
+			for (size_t i = 0; i < returnedList.size(); i++)
 			{
 				toReturn[i] = new char[returnedList[i].length()];
 				std::strncpy(toReturn[i], returnedList[i].c_str(), returnedList[i].length());
@@ -520,7 +548,8 @@ namespace wayne {
 
 		char** getCStringListDirStatic(const char* dirPath)
 		{
-			return getCStringListDirStatic(const_cast<char*>(dirPath));
+			std::string strDirPath(dirPath);
+			return getCStringListDirStatic(strDirPath);
 		}
 
 		char** getCStringListDirStatic(char* dirPath)
@@ -529,7 +558,7 @@ namespace wayne {
 			return getCStringListDirStatic(strDirPath);
 		}
 
-		std::vector<std::string> getStringContent(std::string filePath, std::string readType, int amountOfLines)
+		std::vector<std::string> getStringContent(std::string filePath, int amountOfLines, std::string readType)
 		{
 			std::vector<std::string> fileContent;
 			if (!isFileExist(filePath))
@@ -619,7 +648,7 @@ namespace wayne {
 				{
 					std::getline(fileStream, readBuffer);
 					fileContent.push_back(readBuffer);
-					if (fileContent.size() > amountOfLines)
+					if ((int)fileContent.size() > amountOfLines)
 					{
 						fileContent.erase(fileContent.begin());
 					}
@@ -634,21 +663,23 @@ namespace wayne {
 			}
 		}
 
-		std::vector<std::string> getStringContent(const char* filePath, const char* readType, int amountOfLines)
+		std::vector<std::string> getStringContent(const char* filePath, int amountOfLines, const char* readType)
 		{
-			return getStringContent(const_cast<char*>(filePath), const_cast<char*>(readType), amountOfLines);
+			std::string strFilePath(filePath);
+			std::string strReadType(readType);
+			return getStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
 		std::vector<std::string> getStringContent(char* filePath, char* readType, int amountOfLines)
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
-			return getStringContent(strFilePath, strReadType, amountOfLines);
+			return getStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
 		std::vector<char*> getCStringContent(std::string filePath, std::string readType, int amountOfLines)
 		{
-			std::vector<std::string> returnedList = getStringContent(filePath, readType, amountOfLines);
+			std::vector<std::string> returnedList = getStringContent(filePath, amountOfLines, readType);
 			std::vector<char*> toReturn;
 			for (std::string content : returnedList)
 			{
@@ -661,7 +692,9 @@ namespace wayne {
 
 		std::vector<char*> getCStringContent(const char* filePath, const char* readType, int amountOfLines)
 		{
-			return getCStringContent(const_cast<char*>(filePath), const_cast<char*>(readType), amountOfLines);
+			std::string strFilePath(filePath);
+			std::string strReadType(readType);
+			return getCStringContent(strFilePath, strReadType, amountOfLines);
 		}
 
 		std::vector<char*> getCStringContent(char* filePath, char* readType, int amountOfLines)
@@ -683,7 +716,7 @@ namespace wayne {
 			{
 				while(fileStream)
 				{
-					char byte = '';
+					char byte = '\0';
 					fileStream.read(&byte, 1);
 					fileContent.push_back(byte);
 				}
@@ -701,7 +734,7 @@ namespace wayne {
 				int readCounter = 0;
 				while (fileStream)
 				{
-					char byte = '';
+					char byte = '\0';
 					fileStream.read(&byte, 1);
 					if (readCounter >= refByte && readCounter < refByte + amountOfBytes)
 					{
@@ -731,7 +764,7 @@ namespace wayne {
 				}
 				while (fileStream)
 				{
-					char byte = '';
+					char byte = '\0';
 					fileStream.read(&byte, 1);
 					if (readCounter > refByte && readCounter <= std::stoi(wayne::strUtil::splitString(readType, ' ')[1]))
 					{
@@ -751,7 +784,7 @@ namespace wayne {
 				int readCounter = 0;
 				while(fileStream && readCounter < amountOfBytes)
 				{
-					char byte = '';
+					char byte = '\0';
 					fileStream.read(&byte, 1);
 					fileContent.push_back(byte);
 					readCounter++;
@@ -763,10 +796,10 @@ namespace wayne {
 			{
 				while (fileStream)
 				{
-					char byte = '';
+					char byte = '\0';
 					fileStream.read(&byte, 1);
 					fileContent.push_back(byte);
-					if (fileContent.size() > amountOfBytes)
+					if ((int)fileContent.size() > amountOfBytes)
 					{
 						fileContent.erase(fileContent.begin());
 					}
@@ -783,7 +816,9 @@ namespace wayne {
 
 		std::vector<char> getByteContent(const char* filePath, const char* readType, int amountOfBytes)
 		{
-			return getByteContent(const_cast<char*>(filePath), const_cast<char*>(readType), amountOfBytes);
+			std::string strFilePath(filePath);
+			std::string strReadType(readType);
+			return getByteContent(strFilePath, strReadType, amountOfBytes);
 		}
 
 		std::vector<char> getByteContent(char* filePath, char* readType, int amountOfBytes)
@@ -828,16 +863,16 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					int cutbackLine = refLine + fileContent.size();
-					std::vector<std::string> origFile = getStringContent(filePath, "d" , 0);
-					if (refLine > origFile.size()) {
+					int cutbackLine = refLine + (int)fileContent.size();
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size()) {
 						return false;
 						/*It's impossible to do that.*/
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
@@ -852,7 +887,7 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
@@ -876,8 +911,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<std::string> origFile = getStringContent(filePath, "d" , 0);
-					if (refLine > origFile.size()) {
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size()) {
 						return false;
 						/*It's impossible to do that.*/
 					}
@@ -921,7 +956,9 @@ namespace wayne {
 
 		bool writeStringContent(const char* filePath, std::vector<std::string> fileContent, const char* writeType)
 		{
-			return writeStringContent(const_cast<char*>(filePath), fileContent, const_cast<char*>(writeType));
+			std::string strFilePath(filePath);
+			std::string strWriteType(writeType);
+			return writeStringContent(strFilePath, fileContent, strWriteType);
 		}
 
 		bool writeStringContent(char* filePath, std::vector<std::string> fileContent, char* writeType)
@@ -958,24 +995,24 @@ namespace wayne {
 					writeStream.close();
 					return true;
 				}
-				else if (writeType.find("o" != std::string::npos))
+				else if (writeType.find("o") != std::string::npos)
 				{
 					if (wayne::strUtil::splitString(writeType, ' ').size() != 2)
 					{
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					int cutbackLine = refLine + fileContent.size();
-					std::vector<char*> origFile = getCStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					int cutbackLine = refLine + (int)fileContent.size();
+					std::vector<char*> origFile = getCStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 						/* It's impossible to do that. */
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << *(origFile[i]) << std::endl;
 						}
@@ -990,7 +1027,7 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << *(origFile[i]) << std::endl;
 						}
@@ -1014,8 +1051,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<char*> origFile = getCStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<char*> origFile = getCStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 					}
@@ -1096,24 +1133,24 @@ namespace wayne {
 					writeStream.close();
 					return true;
 				}
-				else if (writeType.find("o" != std::string::npos))
+				else if (writeType.find("o") != std::string::npos)
 				{
 					if (wayne::strUtil::splitString(writeType, ' ').size() != 2)
 					{
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					int cutbackLine = refLine + fileContent.size();
-					std::vector<char> origFile = getByteContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					int cutbackLine = refLine + (int)fileContent.size();
+					std::vector<char> origFile = getByteContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 						/* It's impossible to do that. */
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i];
 						}
@@ -1128,7 +1165,7 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i];
 						}
@@ -1152,8 +1189,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<char> origFile = getByteContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<char> origFile = getByteContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 					}
@@ -1215,7 +1252,7 @@ namespace wayne {
 				{
 					removeFile(filePath);
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;
 					}
@@ -1226,7 +1263,7 @@ namespace wayne {
 				else if (writeType.find("a") != std::string::npos)
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;
 					}
@@ -1234,7 +1271,7 @@ namespace wayne {
 					writeStream.close();
 					return true;
 				}
-				else if (writeType.find("o" != std::string::npos))
+				else if (writeType.find("o") != std::string::npos)
 				{
 					if (wayne::strUtil::splitString(writeType, ' ').size() != 2)
 					{
@@ -1242,20 +1279,20 @@ namespace wayne {
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
 					int cutbackLine = refLine + fileLines;
-					std::vector<std::string> origFile = getStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 						/* It's impossible to do that. */
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
-						for (size_t i = 0; i < fileLines; i++)
+						for (size_t i = 0; i < (size_t)fileLines; i++)
 						{
 							writeStream << fileContent[i] << std::endl;
 						}
@@ -1266,11 +1303,11 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
-						for (size_t i = 0; i < fileLines; i++)
+						for (size_t i = 0; i < (size_t)fileLines; i++)
 						{
 							writeStream << fileContent[i] << std::endl;
 						}
@@ -1290,8 +1327,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<std::string> origFile = getStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 					}
@@ -1300,7 +1337,7 @@ namespace wayne {
 					{
 						if (i == (size_t) refLine)
 						{
-							for (size_t j = 0; j < fileLines; j++)
+							for (size_t j = 0; j < (size_t)fileLines; j++)
 							{
 								writeStream << fileContent[i] << std::endl;
 							}
@@ -1321,7 +1358,7 @@ namespace wayne {
 				if (createFile(filePath))
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;
 					}
@@ -1353,7 +1390,7 @@ namespace wayne {
 				{
 					removeFile(filePath);
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;;
 					}
@@ -1364,7 +1401,7 @@ namespace wayne {
 				else if (writeType.find("a") != std::string::npos)
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;
 					}
@@ -1372,7 +1409,7 @@ namespace wayne {
 					writeStream.close();
 					return true;
 				}
-				else if (writeType.find("o" != std::string::npos))
+				else if (writeType.find("o") != std::string::npos)
 				{
 					if (wayne::strUtil::splitString(writeType, ' ').size() != 2)
 					{
@@ -1380,20 +1417,20 @@ namespace wayne {
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
 					int cutbackLine = refLine + fileLines;
-					std::vector<std::string> origFile = getStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 						/* It's impossible to do that. */
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
-						for (size_t i = 0; i < fileLines; i++)
+						for (size_t i = 0; i < (size_t)fileLines; i++)
 						{
 							writeStream << fileContent[i] << std::endl;
 						}
@@ -1404,11 +1441,11 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i] << std::endl;
 						}
-						for (size_t i = 0; i < fileLines; i++)
+						for (size_t i = 0; i < (size_t)fileLines; i++)
 						{
 							writeStream << fileContent[i] << std::endl;
 						}
@@ -1428,8 +1465,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<std::string> origFile = getStringContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<std::string> origFile = getStringContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 					}
@@ -1438,7 +1475,7 @@ namespace wayne {
 					{
 						if (i == (size_t) refLine)
 						{
-							for (size_t j = 0; j < fileLines; j++)
+							for (size_t j = 0; j < (size_t)fileLines; j++)
 							{
 								writeStream << fileContent[i] << std::endl;
 							}
@@ -1459,7 +1496,7 @@ namespace wayne {
 				if (createFile(filePath))
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileLines; i++)
+					for (size_t i = 0; i < (size_t)fileLines; i++)
 					{
 						writeStream << fileContent[i] << std::endl;
 					}
@@ -1491,7 +1528,7 @@ namespace wayne {
 				{
 					removeFile(filePath);
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileBytes; i++)
+					for (size_t i = 0; i < (size_t)fileBytes; i++)
 					{
 						writeStream << fileContent[i];
 					}
@@ -1502,7 +1539,7 @@ namespace wayne {
 				else if (writeType.find("a") != std::string::npos)
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileBytes; i++)
+					for (size_t i = 0; i < (size_t)fileBytes; i++)
 					{
 						writeStream << fileContent[i];
 					}
@@ -1510,7 +1547,7 @@ namespace wayne {
 					writeStream.close();
 					return true;
 				}
-				else if (writeType.find("o" != std::string::npos))
+				else if (writeType.find("o") != std::string::npos)
 				{
 					if (wayne::strUtil::splitString(writeType, ' ').size() != 2)
 					{
@@ -1518,20 +1555,20 @@ namespace wayne {
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
 					int cutbackLine = refLine + fileBytes;
-					std::vector<char> origFile = getByteContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<char> origFile = getByteContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 						/* It's impossible to do that. */
 					}
-					if (cutbackLine > origFile.size())
+					if ((size_t)cutbackLine > origFile.size())
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i];
 						}
-						for (size_t i = 0; i < fileBytes; i++)
+						for (size_t i = 0; i < (size_t)fileBytes; i++)
 						{
 							writeStream << fileContent[i];
 						}
@@ -1542,11 +1579,11 @@ namespace wayne {
 					else
 					{
 						std::ofstream writeStream(filePath.c_str());
-						for (size_t i = 0; i < refLine; i++)
+						for (size_t i = 0; i < (size_t)refLine; i++)
 						{
 							writeStream << origFile[i];
 						}
-						for (size_t i = 0; i < fileBytes; i++)
+						for (size_t i = 0; i < (size_t)fileBytes; i++)
 						{
 							writeStream << fileContent[i];
 						}
@@ -1566,8 +1603,8 @@ namespace wayne {
 						return false;
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
-					std::vector<char> origFile = getByteContent(filePath, "d", 0);
-					if (refLine > origFile.size())
+					std::vector<char> origFile = getByteContent(filePath, 0, "d");
+					if ((size_t)refLine > origFile.size())
 					{
 						return false;
 					}
@@ -1576,7 +1613,7 @@ namespace wayne {
 					{
 						if (i == (size_t) refLine)
 						{
-							for (size_t j = 0; j < fileBytes; j++)
+							for (size_t j = 0; j < (size_t)fileBytes; j++)
 							{
 								writeStream << fileContent[i];
 							}
@@ -1597,7 +1634,7 @@ namespace wayne {
 				if (createFile(filePath))
 				{
 					std::ofstream writeStream(filePath.c_str());
-					for (size_t i = 0; i < fileBytes; i++)
+					for (size_t i = 0; i < (size_t)fileBytes; i++)
 					{
 						writeStream << fileContent[i];
 					}
@@ -1611,7 +1648,9 @@ namespace wayne {
 
 		bool writeByteContentStatic(const char* filePath, char* fileContent, int fileBytes, const char* writeType)
 		{
-			return writeByteContentStatic(const_cast<char*>(filePath), fileContent, fileBytes, const_cast<char*>(writeType));
+			std::string strFilePath(filePath);
+			std::string strWriteType(writeType);
+			return writeByteContentStatic(strFilePath, fileContent, fileBytes, strWriteType);
 		}
 
 		bool writeByteContentStatic(char* filePath, char* fileContent, int fileBytes, char* writeType)
