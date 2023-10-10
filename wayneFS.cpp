@@ -670,14 +670,14 @@ namespace wayne {
 			return getStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
-		std::vector<std::string> getStringContent(char* filePath, char* readType, int amountOfLines)
+		std::vector<std::string> getStringContent(char* filePath, int amountOfLines, char* readType)
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
 			return getStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
-		std::vector<char*> getCStringContent(std::string filePath, std::string readType, int amountOfLines)
+		std::vector<char*> getCStringContent(std::string filePath, int amountOfLines, std::string readType)
 		{
 			std::vector<std::string> returnedList = getStringContent(filePath, amountOfLines, readType);
 			std::vector<char*> toReturn;
@@ -690,21 +690,21 @@ namespace wayne {
 			return toReturn;
 		}
 
-		std::vector<char*> getCStringContent(const char* filePath, const char* readType, int amountOfLines)
+		std::vector<char*> getCStringContent(const char* filePath, int amountOfLines, const char* readType)
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
-			return getCStringContent(strFilePath, strReadType, amountOfLines);
+			return getCStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
-		std::vector<char*> getCStringContent(char* filePath, char* readType, int amountOfLines)
+		std::vector<char*> getCStringContent(char* filePath, int amountOfLines, char* readType)
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
-			return getCStringContent(strFilePath, strReadType, amountOfLines);
+			return getCStringContent(strFilePath, amountOfLines, strReadType);
 		}
 
-		std::vector<char> getByteContent(std::string filePath, std::string readType, int amountOfBytes)
+		std::vector<char> getByteContent(std::string filePath, int amountOfBytes, std::string readType)
 		{
 			std::vector<char> fileContent;
 			if (!isFileExist(filePath))
@@ -818,14 +818,14 @@ namespace wayne {
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
-			return getByteContent(strFilePath, strReadType, amountOfBytes);
+			return getByteContent(strFilePath, amountOfBytes, strReadType);
 		}
 
 		std::vector<char> getByteContent(char* filePath, char* readType, int amountOfBytes)
 		{
 			std::string strFilePath(filePath);
 			std::string strReadType(readType);
-			return getByteContent(strFilePath, strReadType, amountOfBytes);
+			return getByteContent(strFilePath, amountOfBytes, strReadType);
 		}
 
 		bool writeStringContent(std::string filePath, std::vector<std::string> fileContent, std::string writeType)
@@ -1003,7 +1003,7 @@ namespace wayne {
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
 					int cutbackLine = refLine + (int)fileContent.size();
-					std::vector<char*> origFile = getCStringContent(filePath, 0, "d");
+					std::vector<char*> origFile = getCStringContent(filePath, 0, (std::string)"d");
 					if ((size_t)refLine > origFile.size())
 					{
 						return false;
@@ -1555,7 +1555,7 @@ namespace wayne {
 					}
 					int refLine = std::stoi(wayne::strUtil::splitString(writeType, ' ')[1]);
 					int cutbackLine = refLine + fileBytes;
-					std::vector<char> origFile = getByteContent(filePath, 0, "d");
+					std::vector<char> origFile = getByteContent(filePath, 0, (std::string)"d");
 					if ((size_t)refLine > origFile.size())
 					{
 						return false;
