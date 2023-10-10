@@ -92,17 +92,37 @@ This utility has some limitation due to the following:
   
   - Returns <code>bool</code>. <code>true</code> if <code>dirPath</code> is already occupied.
   
-  - **Important Notes:** It does not check whether the <code>dirPath</code> is a directory or file.   The reason that the function is implemented in this way is due to many known filesystems' limitation: **It is impossible to have either a leaf or a node under the same structure share same name.** Simply speaking: file and directory with same exact name cannot be stored under the same directory.
+  - **Important Notes:** It does not check whether the <code>dirPath</code> is a directory or file.   The reason that the function is implemented in this way is due to many known filesystems' limitation: **It is impossible to have either a leaf or a node under the same structure that share same name.** Simply speaking: file and directory with same exact name cannot be stored under the same directory.
 
 - <code>getDirectorySize(std::string/char* dirPath)</code>
+  
+  - This function sums up the size of every file (including all files under sub directories) in the directory <code>dirPath</code> and returns the final result.
+  
+  - Returns <code>int</code>
 
 - <code>getStringListDir(std::string/char* dirPath)</code>
+  
+  - This function returns a list of absolute path of every item (including all files and directories, and every item under subdirectories) in the directory <code>dirPath</code>.
+  
+  - Returns <code>std::vector\<std::string\></code>
 
 - <code>getCStringListDir(std::string/char* dirPath)</code>
+  
+  - This function acts the same as <code>getStringListDir</code>, but instead of returning the <code>std::vector\<std::string\></code> it returns <code>std::vector\<char\*\></code>
+  
+  - Returns <code>std::vector\<char\*\></code>
 
 - <code>getStringListDirStatic(std::string/char* dirPath)</code>
+  
+  - This function acts the same as <code>getStringListDir</code>, but it returns static <code>std::string</code> array.
+  
+  - Returns <code>std::string*</code>
 
 - <code>getCStringListDirStatic(std::string/char* dirPath)</code>
+  
+  - This function acts the same as <code>getStringListDir</code>, but it returns static 2-dimentional <code>char</code> array.
+  
+  - Returns <code>char\*\*</code>
 
 #### File Operation
 
