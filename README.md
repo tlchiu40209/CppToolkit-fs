@@ -87,6 +87,12 @@ This utility has some limitation due to the following:
   - Returns <code>bool</code>. <code>true</code> if <code>dirPath</code> is a valid directory, <code>false</code> otherwise.
 
 - <code>isDirectoryExist(std::string/char* dirPath)</code>
+  
+  - Determine whether the path <code>dirPath</code> is already occupied.
+  
+  - Returns <code>bool</code>. <code>true</code> if <code>dirPath</code> is already occupied.
+  
+  - **Important Notes:** It does not check whether the <code>dirPath</code> is a directory or file.   The reason that the function is implemented in this way is due to many known filesystems' limitation: **It is impossible to have either a leaf or a node under the same structure share same name.** Simply speaking: file and directory with same exact name cannot be stored under the same directory.
 
 - <code>getDirectorySize(std::string/char* dirPath)</code>
 
