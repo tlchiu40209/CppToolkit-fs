@@ -157,14 +157,42 @@ This utility has some limitation due to the following:
     - Overwrite - <code>"o"</code>: If the <code>destPath</code> is a file, it will be replaced by the file at <code>sourcePath</code>.
     
     - Safe - <code>"s"</code>: If the <code>destPath</code> existed, no action will be taken.
+  
+  - Returns <code>bool</code>. <code>true</code> if the file is successfully copied, <code>false</code> otherwise.
 
 - <code>moveFile(std::string/char* sourcePath, std::string/char* destPath, std::string/char* writeType)</code>
+  
+  - Moves the file at given absolute path <code>sourcePath</code> to the destination <code>destPath</code>.
+  
+  - <code>writeType</code> is an optional parameter that regulates the behavior of <code>moveFile</code>, here is the list of supported <code>writeType</code>
+    
+    - Default - <code>"d"</code>: Default behavior of <code>moveFile</code> if no <code>writeType</code> were given. In this function, it is redirected to <code>"s"</code>
+    
+    - Overwrite - <code>"o"</code>: If the <code>destPath</code> is a file, it will be replaced by the file at <code>sourcePath</code>.
+    
+    - Safe - <code>"s"</code>: If the <code>destPath</code> existed, no action will be taken.
+  
+  - Returns <code>bool</code>. <code>true</code> if the file is successfully moved, <code>false</code> otherwise.
 
 - <code>isFile(std::string/char* filePath)</code>
+  
+  - Determines whether the path <code>filePath</code> is pointed to a valid file.
+  
+  - Returns <code>bool</code>. <code>true</code> if <code>filePath</code> is a valid file, <code>false</code> otherwise.
 
 - <code>isFileExist(std::string/char* filePath)</code>
+  
+  - Determines whether the path <code>filePath</code> is already occupied.
+  
+  - Returns <code>bool</code>. <code>true</code> if <code>filePath</code> is already occupied.
+  
+  - **Important Notes:** It does not check whether the <code>filePath</code> is a file or directory. The reason that the function is implemented in this way is due to many known filesystems' limitation: **It is impossible to have either a leaf or node under the same structure that share same name.** Simply speaking: file and directory with same exact name cannot be stored under the same directory.
 
 - <code>getFileSize(std::string/char* filePath)</code>
+  
+  - Returns the file size of the file <code>filePath</code>
+  
+  - Returns <code>int</code>
 
 - <code>getStringContent(std::string/char* filePath, int amountOfLines, std::string/char* readType)</code>
 
