@@ -50,7 +50,7 @@ This utility has some limitation due to the following:
 
 - <code>copyDirectory(std::string/char* sourcePath, std::string/char* destPath, std::string/char* writeType)</code>
   
-  - Copies the directory (including all files and subdirectories) at given absolute path <code>dirPath</code> to the destination absolute path <code>destPath</code>
+  - Copies the directory (including all files and subdirectories) at given absolute path <code>sourcePath</code> to the destination absolute path <code>destPath</code>
   
   - <code>writeType</code> is an optional parameter that regulates the behavior of <code>copyDirectory</code>, here is the list of supported <code>writeType</code>
     
@@ -127,10 +127,36 @@ This utility has some limitation due to the following:
 #### File Operation
 
 - <code>createFile(std::string/char* filePath, std::string/char* writeType)</code>
+  
+  - Creates an empty file at given absolute path <code>filePath</code>
+  
+  - <code>writeType</code> is an optional parameter that regulates the behavior of <code>createFile</code>, here is the list of supported <code>filePath</code>
+    
+    - Default - <code>"d"</code>: Default behavior of <code>createFile</code> if no <code>writeType</code> were given. In this function, it is redirected to <code>"s"</code>
+    
+    - Overwrite - <code>"o"</code>: If the given path <code>filePath</code> existed, it will delete and remove the file of <code>filePath</code>, and create a new file at the same place.
+    
+    - Safe - <code>"s"</code>: If the given path <code>filePath</code> existed, no action will be taken.
+  
+  - Returns <code>bool</code>. <code>true</code> if the file is successfully created, <code>false</code> otherwise.
 
 - <code>removeFile(std::string/char* filePath)</code>
+  
+  - Removes the file at given absolute path <code>filePath</code>.
+  
+  - Returns <code>bool</code>. <code>true</code> if the file is successfully removed, <code>false</code> otherwise.
 
 - <code>copyFile(std::string/char* sourcePath, std::string/char* destPath, std::string/char* writeType)</code>
+  
+  - Copies the file at given absolute path <code>sourcePath</code> to the destination <code>destPath</code>.
+  
+  - <code>writeType</code> is an optional parameter that regulates the behavior of <code>copyFile</code>, here is the list of supported <code>writeType</code>
+    
+    - Default - <code>"d"</code>: Default behavior of <code>copyFile</code> if no <code>writeType</code> were given. In this function, it is redirected to <code>"s"</code>
+    
+    - Overwrite - <code>"o"</code>: If the <code>destPath</code> is a file, it will be replaced by the file at <code>sourcePath</code>.
+    
+    - Safe - <code>"s"</code>: If the <code>destPath</code> existed, no action will be taken.
 
 - <code>moveFile(std::string/char* sourcePath, std::string/char* destPath, std::string/char* writeType)</code>
 
